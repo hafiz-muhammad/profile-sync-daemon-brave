@@ -53,9 +53,17 @@ download_and_modify() {
             echo " - Added '#  brave' to possible values list in '$PSD_CONF_FILE'."
             #
             # Add 'brave' to BROWSERS array in psd.conf.
-            sed -i 's/^# *BROWSERS="\([^"]*\)"/BROWSERS="\1"/g' "$PSD_CONF_FILE"
-            sed -i '/\bbrave\b/!s/BROWSERS="/BROWSERS="brave /' "$PSD_CONF_FILE"
-            sed -i 's/BROWSERS="\(.*\) "/BROWSERS="\1"/' "$PSD_CONF_FILE"
+            if grep -q "#BROWSERS=" "$PSD_CONF_FILE"; then
+                sed -i 's/#BROWSERS=/BROWSERS=/g' "$PSD_CONF_FILE"
+            elif grep -q "#BROWSER=(" "$PSD_CONF_FILE"; then
+                sed -i 's/#BROWSER=(/BROWSER=(/g' "$PSD_CONF_FILE"
+            fi
+            #
+            if grep -q "BROWSERS=()" "$PSD_CONF_FILE"; then
+                sed -i 's/BROWSERS=()/BROWSERS=(brave)/g' "$PSD_CONF_FILE"
+            elif grep -q "BROWSERS=(" "$PSD_CONF_FILE"; then
+                sed -i 's/BROWSERS=(/BROWSERS=(brave /g' "$PSD_CONF_FILE"
+            fi
             echo " - Added 'brave' to BROWSERS array in '$PSD_CONF_FILE'."
 
             echo -e "$SEPARATOR"
